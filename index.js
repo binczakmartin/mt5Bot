@@ -1,4 +1,4 @@
-/* dirty expres API */
+/* dirty express API */
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 app.post('/:market', (req, res) => {
   const market = req.params.market;
   const content = JSON.parse(req.body.replace(/\0/g, ''));
-
+  console.log(`POST ${market} ${content.length}`);
   fs.writeFileSync(`data/${market}.json`, JSON.stringify(content), "utf8");
 
   res.send({status: 'OK'});
