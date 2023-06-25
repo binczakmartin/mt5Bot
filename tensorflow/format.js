@@ -22,6 +22,17 @@ export const getFeatures = function (pair) {
   return features;
 };
 
+export const getSequences = function (seq, data) {
+  const sequences = [];
+  
+  for (let i = 0; i <= data.length - seq; i++) {
+    const sequence = data.slice(i, i + seq);
+    sequences.push(sequence);
+  }
+
+  return sequences.slice(-seq);
+}
+
 export const getFileNamesWithoutExtension = function () {
   const fileNames = fs.readdirSync('./data');
   const namesWithoutExtension = fileNames.map((fileName) => {

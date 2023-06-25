@@ -5,17 +5,18 @@
 
 import * as tf from '@tensorflow/tfjs-node';
 
-import { getFeatures } from "./format.js";
+import { getFeatures, getSequences } from "./format.js";
 import { loadModel } from './model.js';
 
 export const predictNextClose = async function (pair) {
   const model = await loadModel(pair);
+  const data = getFeatures(pair);
+  const seq = getSequences(150, data)
 
-  let data = getFeatures(pair);
+  const newTensor = tf.tensor3d(seq);
+  const prevData = seq[seq.length-1][seq[seq.length-1].length - 1];
+  let nextData = [...model.predict(newTensor).dataSync().slice(-5)];
+  nextData = nextData.map((elem) => elem = + Number(elem).toFixed(2));
 
-  const newTensor = tf.tensor2d(data);
-
-  const nextClosingPrice = model.predict(newTensor).dataSync()[0];
-  console.log(data[data.length - 1]);
-  console.log(`\x1b[38;5;178m${pair}\x1b[0m `, nextClosingPrice);
+  return {pair, nextData, prevData};
 };

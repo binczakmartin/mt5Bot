@@ -7,48 +7,35 @@ import * as tf from '@tensorflow/tfjs-node';
 
 import { resolve } from 'path';
 import { loadModel } from './model.js';
-import { getFeatures } from './format.js';
+import { getFeatures, getSequences } from './format.js';
 
 const savedModelPath = './models';
 
 export const trainModel = async (pair) => {
-  console.log("training pair ", pair)
   const dataset = getFeatures(pair);
-  const trainSize = Math.floor(dataset.length * 0.75);
+  const trainSize = Math.floor(dataset.length * 0.5);
+  const trainData = tf.tensor3d(getSequences(150, dataset.slice(0, trainSize)), [150, 150, 5]);
+  const trainLabels = tf.tensor3d(getSequences(150, dataset.slice(1, trainSize)), [150, 150, 5]);
 
-  const X_train = tf.tensor2d(dataset.slice(0, trainSize));
-  const Y_train = tf.tensor1d(dataset.slice(0, trainSize).map(row => row[4]));
-  const X_test = tf.tensor2d(dataset.slice(trainSize));
-  const Y_test = tf.tensor1d(dataset.slice(trainSize).map(row => row[4]));
-  
   const model = await loadModel(pair);
 
-  // early stopping to avoid overfitting
+  // Early stopping to avoid overfitting
   const earlyStop = tf.callbacks.earlyStopping({
-    monitor: 'val_loss',
-    patience: 5,
+    monitor: 'loss',
+    patience: 200,
     restoreBestModel: true,
   });
 
   // Train model with early stopping
-  const history = await model.fit(X_train, Y_train, {
-    epochs: 50,
-    batchSize: 1500, // Increase batch size for parallelism
-    validationData: [X_test, Y_test],
-    callbacks: [earlyStop, tf.node.tensorBoard('./logs')],
-    verbose: 2,
+  const history = await model.fit(trainData, trainLabels, {
+    epochs: 100,
+    batchSize: 2000, // Increase batch size for parallelism
+    callbacks: [tf.node.tensorBoard(`./logs/${pair}`)],
+    verbose: 1,
   });
 
-  await X_train.dispose();
-  await Y_train.dispose();
-  
-  // Evaluate the model
-  const loss = model.evaluate(X_test, Y_test);
-  console.log(`Test loss: ${loss}`);
-
-  await X_test.dispose();
-  await Y_test.dispose();
-
   await model.save(`file://${resolve(savedModelPath)}/${pair}`);
+  await trainData.dispose();
+  await trainLabels.dispose();
   await model.dispose();
 };
