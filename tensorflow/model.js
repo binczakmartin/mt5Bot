@@ -1,3 +1,8 @@
+/*******************************************************************************
+** Model architectrure
+** BINCZAK Martin - 2023
+*******************************************************************************/
+
 import fs from "fs";
 import * as tf from "@tensorflow/tfjs";
 
@@ -15,28 +20,14 @@ export const loadModel = async function (pair) {
     const input = tf.input({ shape: [150, 5] });
 
     const rnn1 = tf.layers.simpleRNN({
-      units: 256, // Increase number of units
-      activation: "selu", // Experiment with different activation functions
+      units: 256,
+      activation: "selu",
       returnSequences: true,
     }).apply(input);
 
-    // const dense1 = tf.layers.dense({
-    //   units: 64, // Increase number of units
-    //   activation: "relu",
-    // }).apply(rnn1);
-
-    // const dropout1 = tf.layers.dropout({ rate: 0.2 }).apply(dense1); // Add dropout layer
-
-    // const dense2 = tf.layers.dense({
-    //   units: 16, // Increase number of units
-    //   activation: "linear",
-    // }).apply(dropout1);
-
-    // const dropout2 = tf.layers.dropout({ rate: 0.2 }).apply(dense2); // Add dropout layer
-
     const output = tf.layers.dense({
       units: 5,
-      activation: "linear", // Use linear activation for regression task
+      activation: "linear",
     }).apply(rnn1);
 
     model = tf.model({ inputs: input, outputs: output });
