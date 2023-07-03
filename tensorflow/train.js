@@ -28,7 +28,7 @@ export const trainModel = async (pair) => {
 
   // Train model with early stopping
   const history = await model.fit(trainData, trainLabels, {
-    epochs: 100,
+    epochs: 2500,
     batchSize: 2000, // Increase batch size for parallelism
     callbacks: [tf.node.tensorBoard(`./logs/${pair}`)],
     verbose: 1,
