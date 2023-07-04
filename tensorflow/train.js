@@ -26,9 +26,9 @@ export const trainModel = async (pair) => {
     restoreBestModel: true,
   });
 
-  // Train model with early stopping
+  // Train model without early stopping
   const history = await model.fit(trainData, trainLabels, {
-    epochs: 2500,
+    epochs: 150,
     batchSize: 2000, // Increase batch size for parallelism
     callbacks: [tf.node.tensorBoard(`./logs/${pair}`)],
     verbose: 1,
