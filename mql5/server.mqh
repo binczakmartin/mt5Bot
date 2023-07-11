@@ -10,7 +10,7 @@ void sendOHLCV(string market, const string& jsonData) {
     StringToCharArray(jsonData, payload, CP_UTF8);
     headers = "Content-Type: application/json";
     PrintFormat("POST %s", ENDPOINT + "/" + market);
-    res = WebRequest("POST", ENDPOINT + "/" + market, cookie, headers, TIMEOUT, payload, ArraySize(payload) - 1, result, headers);
+    res = WebRequest("POST", ENDPOINT + "/" + market, cookie, headers, TIMEOUT, payload, ArraySize(payload), result, headers);
     
     if(res == -1) Print("Error in WebRequest. Error code =", GetLastError());
 }
