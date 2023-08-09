@@ -14,3 +14,29 @@ void sendOHLCV(string market, const string& jsonData) {
     
     if(res == -1) Print("Error in WebRequest. Error code =", GetLastError());
 }
+
+string GetPredictions() {
+   string cookie=NULL,headers;
+   char   post[],result[];
+    
+    PrintFormat("GET %s", "http://localhost:3005/predict");
+    
+    int res = WebRequest(
+        "GET", 
+        ENDPOINT + "/predict", 
+        cookie, 
+        NULL, 
+        TIMEOUT,
+        post,
+        0,
+        result,
+        headers
+    );
+    
+    if (res == -1) {
+        Print("Error in WebRequest. Error code =", GetLastError());
+        return "";
+    }
+    
+    return CharArrayToString(result);
+}
