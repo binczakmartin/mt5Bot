@@ -8,7 +8,8 @@ MqlTradeResult placeLong(string symbol, double price, double tp, double sl, doub
    request.volume    = volume;
    request.sl        = sl;
    request.tp        = tp;                  
-   request.type      = ORDER_TYPE_BUY_LIMIT;                        
+   request.type      = ORDER_TYPE_BUY_LIMIT;
+  //  request.type      = ORDER_TYPE_BUY;
    request.price     = price; 
    request.deviation = 10;                                    
    request.magic     = 4444;
@@ -31,7 +32,8 @@ MqlTradeResult placeShort(string symbol, double price, double tp, double sl, dou
    request.volume    = volume;
    request.sl        = sl;
    request.tp        = tp;                  
-   request.type      = ORDER_TYPE_SELL_LIMIT;                        
+   request.type      = ORDER_TYPE_SELL_LIMIT;
+  //  request.type      = ORDER_TYPE_SELL;                        
    request.price     = price; 
    request.deviation = 10;                                    
    request.magic     = 4444;
