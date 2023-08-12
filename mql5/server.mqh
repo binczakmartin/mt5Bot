@@ -9,13 +9,12 @@ void sendOHLCV(string market, const string& jsonData) {
     ResetLastError();
     StringToCharArray(jsonData, payload, CP_UTF8);
     headers = "Content-Type: application/json";
-    PrintFormat("POST %s", ENDPOINT + "/" + market);
     res = WebRequest("POST", ENDPOINT + "/" + market, cookie, headers, TIMEOUT, payload, ArraySize(payload), result, headers);
     
     if(res == -1) Print("Error in WebRequest. Error code =", GetLastError());
 }
 
-string GetPredictions() {
+string getPredictions() {
    string cookie=NULL,headers;
    char   post[],result[];
     

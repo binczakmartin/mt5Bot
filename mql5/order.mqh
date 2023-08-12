@@ -3,7 +3,6 @@ MqlTradeResult placeLong(string symbol, double price, double tp, double sl, doub
    MqlTradeRequest   request={};
    MqlTradeResult    result={};
    
-   Print("volume: %f", volume);
    request.action    = TRADE_ACTION_PENDING;                     
    request.symbol    = symbol;                                  
    request.volume    = volume;
@@ -13,9 +12,11 @@ MqlTradeResult placeLong(string symbol, double price, double tp, double sl, doub
    request.price     = price; 
    request.deviation = 10;                                    
    request.magic     = 4444;
-   //result.order      = orderCCIticket;
    
-   OrderSend(request, result);
+  if (!OrderSend(request, result)) {
+    Print("OrderSend failed with error code: ", GetLastError());
+    result.retcode = GetLastError(); // You can return the error code as part of the result if needed
+  }
    
    return result;
 }
@@ -24,7 +25,7 @@ MqlTradeResult placeLong(string symbol, double price, double tp, double sl, doub
 MqlTradeResult placeShort(string symbol, double price, double tp, double sl, double volume ) {
    MqlTradeRequest   request={};
    MqlTradeResult    result={};
-   
+
    request.action    = TRADE_ACTION_PENDING;                     
    request.symbol    = symbol;                                  
    request.volume    = volume;
@@ -34,9 +35,11 @@ MqlTradeResult placeShort(string symbol, double price, double tp, double sl, dou
    request.price     = price; 
    request.deviation = 10;                                    
    request.magic     = 4444;
-   //result.order      = orderCCIticket;
    
-   OrderSend(request, result);
+  if (!OrderSend(request, result)) {
+    Print("OrderSend failed with error code: ", GetLastError());
+    result.retcode = GetLastError(); // You can return the error code as part of the result if needed
+  }
    
    return result;
 }

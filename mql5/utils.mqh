@@ -21,6 +21,22 @@ string GetJSONValueByIndex(string json, string key, int index, int startPos = 0)
     return "";
 }
 
+void parsePredictions(string response, Prediction &predictions[], int &predictionsCount) {
+  LogToFile("Réponse de l'API : " + response);
+  predictionsCount = 0; // Initialize predictions count
+  for (int i = 0; i < ArraySize(MARKETS); i++) {
+    string pair = MARKETS[i];
+    int pairPosition = StringFind(response, pair);
+    if (pairPosition != -1) {
+      string jsonValue = GetJSONValueByIndex(response, "nextData", 0, pairPosition);
+      predictions[predictionsCount].pair = pair;
+      predictions[predictionsCount].predictedPrice = StringToDouble(jsonValue);
+      predictions[predictionsCount].currentPrice = (SymbolInfoDouble(pair, SYMBOL_BID));
+      predictionsCount++;
+    }
+  }
+}
+
 void PrintPredictions(Prediction &predictions[]) {
     Print("----- Affichage des Prédictions -----");
     for (int i = 0; i < ArraySize(predictions); i++) {
@@ -53,27 +69,27 @@ double GetNormalizedVolume(string symbol, double desiredVolume) {
     return MathRound((desiredVolume - minVolume) / stepVolume) * stepVolume + minVolume;
 }
 
-bool HasOpenPosition(string symbol) {
+bool checkOpenPosition(string symbol) {
     for(int i = PositionsTotal() - 1; i >= 0; i--) {
         string positionSymbol = PositionGetSymbol(i);
         if (positionSymbol == symbol) {
-            return true;
-            Print("have open position %s ", symbol);
+            Print(symbol, " have open position ", symbol);
+            return false;
         }
     }
-    return false;
+    return true;
 }
 
-bool HasOpenOrder(string symbol) {
+bool checkOpenOrder(string symbol) {
   for(int i = 0; i < OrdersTotal(); i++) {
     ulong ticket = OrderGetTicket(i);
     string orderSymbol;
     if (OrderGetString(ORDER_SYMBOL, orderSymbol) && orderSymbol == symbol) {
-      Print("has open order %s ", symbol);
-      return true;
+      Print("have open order %s ", symbol);
+      return false;
     }
   }
-  return false;
+  return true;
 }
 
 bool CheckTotalOrdersAndPositions(int maxOrders) {
@@ -84,10 +100,13 @@ bool CheckTotalOrdersAndPositions(int maxOrders) {
   }
 
   totalOrders += PositionsTotal();
-  Print("totalOrders %d ", totalOrders <= maxOrders);
   return totalOrders <= maxOrders;
 }
 
+double round(double price, string symbol) {
+  int precision = SymbolInfoInteger(symbol, SYMBOL_DIGITS);
+  return NormalizeDouble(price, precision);
+}
 
 
 
