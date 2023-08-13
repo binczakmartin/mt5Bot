@@ -58,22 +58,10 @@ void LogToFile(string message) {
     }
 }
 
-double GetNormalizedVolume(string symbol, double desiredVolume) {
-    double minVolume = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MIN);
-    double maxVolume = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MAX);
-    double stepVolume = SymbolInfoDouble(symbol, SYMBOL_VOLUME_STEP);
-
-    if (desiredVolume < minVolume) return minVolume;
-    if (desiredVolume > maxVolume) return maxVolume;
-
-    return MathRound((desiredVolume - minVolume) / stepVolume) * stepVolume + minVolume;
-}
-
 bool checkOpenPosition(string symbol) {
     for(int i = PositionsTotal() - 1; i >= 0; i--) {
         string positionSymbol = PositionGetSymbol(i);
         if (positionSymbol == symbol) {
-            Print(symbol, " have open position ", symbol);
             return false;
         }
     }
@@ -85,7 +73,6 @@ bool checkOpenOrder(string symbol) {
     ulong ticket = OrderGetTicket(i);
     string orderSymbol;
     if (OrderGetString(ORDER_SYMBOL, orderSymbol) && orderSymbol == symbol) {
-      Print("have open order %s ", symbol);
       return false;
     }
   }
@@ -107,8 +94,3 @@ double round(double price, string symbol) {
   int precision = SymbolInfoInteger(symbol, SYMBOL_DIGITS);
   return NormalizeDouble(price, precision);
 }
-
-
-
-
-

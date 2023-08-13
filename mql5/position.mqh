@@ -5,34 +5,6 @@
 #include "variables.mqh"
 #include <Trade\Trade.mqh>
 
-double getPrice(string symbol) {
-  double bid = SymbolInfoDouble(symbol, SYMBOL_BID);
-  double ask = SymbolInfoDouble(symbol, SYMBOL_ASK);
-
-  return round((bid + ask) / 2, symbol); // Round to the symbol's precision
-}
-
-void openPosition(Prediction &prediction) {
-  double price = getPrice(prediction.pair);
-  double capitalUnrounded = AccountInfoDouble(ACCOUNT_BALANCE) * POSITION_WEIGHT;
-  double capital = MathRound(capitalUnrounded);
-  double volumeUnrounded = capital / price;
-  double volume = GetNormalizedVolume(prediction.pair, volumeUnrounded);
-  double priceDifference = (prediction.predictedPrice - prediction.currentPrice) / prediction.currentPrice;
-  double tpLong = round(price * 1.005, prediction.pair);
-  double slLong = round(price * 0.985, prediction.pair);
-  double tpShort = round(price * 0.995, prediction.pair);
-  double slShort = round(price * 1.015, prediction.pair);
-
-  if (priceDifference >= 0.006) {
-    Print("placeLong pair:", prediction.pair, " price:", price, " tp:", tpLong, " sl:", slLong, " volume:", volume);
-    placeLong(prediction.pair, price, tpLong, slLong, volume);
-  } else if (priceDifference < -0.006) {
-    Print("placeShort pair:", prediction.pair, " price:", price, " tp:", tpShort, " sl:", slShort, " volume:", volume);
-    placeShort(prediction.pair, price, tpShort, slShort, volume);
-  }
-}
-
 void OpenPositions(string data) {
   int predictionsCount;
   
@@ -51,4 +23,35 @@ void OpenPositions(string data) {
 
     Sleep(3000);
   }
+}
+
+void openPosition(Prediction &prediction) {
+  double priceDifference = (prediction.predictedPrice - prediction.currentPrice) / prediction.currentPrice;
+
+  if (priceDifference >= 0.01) {
+    openOrder(prediction, true);
+  } else if (priceDifference < -0.01) {
+    openOrder(prediction, false);
+  }
+}
+
+double GetNormalizedVolume(string symbol, double desiredVolume) {
+    double minVolume = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MIN);
+    double maxVolume = SymbolInfoDouble(symbol, SYMBOL_VOLUME_MAX);
+    double stepVolume = SymbolInfoDouble(symbol, SYMBOL_VOLUME_STEP);
+
+    if (desiredVolume < minVolume) return minVolume;
+    if (desiredVolume > maxVolume) return maxVolume;
+
+    return MathRound((desiredVolume - minVolume) / stepVolume) * stepVolume + minVolume;
+}
+
+double getPrice(string symbol, bool isShort) {
+  double bid = SymbolInfoDouble(symbol, SYMBOL_BID);
+  double ask = SymbolInfoDouble(symbol, SYMBOL_ASK);
+
+  if (isShort) {
+      return round((bid*5 + ask) / 6, symbol);
+  }
+  return round((bid + ask*5) / 6, symbol); 
 }
