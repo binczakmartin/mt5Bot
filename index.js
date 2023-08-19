@@ -3,6 +3,7 @@
 ** BINCZAK Martin - 2023
 *******************************************************************************/
 
+import argsParser from 'args-parser';
 import express from 'express';
 import bodyParser from 'body-parser';
 import rawBody from 'raw-body';
@@ -68,20 +69,31 @@ app.get('/predict', async (req, res) => {
   }
 });
 
-// AI training loop
-(async () => {
-  while (true) {
-    let promiseTab = []; 
-    let markets = getFileNamesWithoutExtension();
+const parsearguments = async function () {
+  const args = argsParser(process.argv);
 
-    markets.forEach((market) => promiseTab.push(trainModel(market)));
-    const results = await Promise.all(promiseTab);
-    process.stdout.write('\x1Bc');
-    // results.forEach((result) => console.log(`pair: ${result.pair}, loss: ${result.loss} %`));
+  // AI training loop
+  if (args['train']) {
+    (async () => {
+      while (true) {
+        let promiseTab = []; 
+        let markets = getFileNamesWithoutExtension();
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+        markets.forEach((market) => promiseTab.push(trainModel(market)));
+        const results = await Promise.all(promiseTab);
+        process.stdout.write('\x1Bc');
+        // results.forEach((result) => console.log(`pair: ${result.pair}, loss: ${result.loss} %`));
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    })();
   }
-})();
 
-// launch API
-app.listen(port, async () => console.log(`listening on port ${port}`));
+  // launch API
+  if (args['serve']) {
+    app.listen(port, async () => console.log(`listening on port ${port}`));
+  } 
+
+}
+
+parsearguments();
