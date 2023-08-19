@@ -22,14 +22,14 @@ export const trainModel = async (pair) => {
   // Early stopping to avoid overfitting
   const earlyStop = tf.callbacks.earlyStopping({
     monitor: 'loss',
-    patience: 200,
+    patience: 100,
     restoreBestModel: true,
   });
 
   // Train model without early stopping
   const history = await model.fit(trainData, trainLabels, {
-    epochs: 250,
-    batchSize: 2000, // Increase batch size for parallelism
+    epochs: 200,
+    batchSize: 20, // Increase batch size for parallelism
     callbacks: [tf.node.tensorBoard(`./logs/${pair}`)],
     verbose: 1,
   });

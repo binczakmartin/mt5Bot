@@ -75,7 +75,6 @@ app.get('/predict', async (req, res) => {
     let markets = getFileNamesWithoutExtension();
 
     markets.forEach((market) => promiseTab.push(trainModel(market)));
-    
     const results = await Promise.all(promiseTab);
     process.stdout.write('\x1Bc');
     // results.forEach((result) => console.log(`pair: ${result.pair}, loss: ${result.loss} %`));
