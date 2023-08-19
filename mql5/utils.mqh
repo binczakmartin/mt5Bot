@@ -25,13 +25,12 @@ void parsePredictions(string response, Prediction &predictions[], int &predictio
   LogToFile("Réponse de l'API : " + response);
   predictionsCount = 0; // Initialize predictions count
   for (int i = 0; i < ArraySize(MARKETS); i++) {
-    string pair = MARKETS[i];
-    int pairPosition = StringFind(response, pair);
+    int pairPosition = StringFind(response, MARKETS[i]);
     if (pairPosition != -1) {
       string jsonValue = GetJSONValueByIndex(response, "nextData", 0, pairPosition);
-      predictions[predictionsCount].pair = pair;
+      predictions[predictionsCount].pair = MARKETS[i];
       predictions[predictionsCount].predictedPrice = StringToDouble(jsonValue);
-      predictions[predictionsCount].currentPrice = (SymbolInfoDouble(pair, SYMBOL_BID));
+      predictions[predictionsCount].currentPrice = (SymbolInfoDouble(MARKETS[i], SYMBOL_BID));
       predictionsCount++;
     }
   }
@@ -93,4 +92,14 @@ bool CheckTotalOrdersAndPositions(int maxOrders) {
 double round(double price, string symbol) {
   int precision = SymbolInfoInteger(symbol, SYMBOL_DIGITS);
   return NormalizeDouble(price, precision);
+}
+
+double getPrice(string symbol, bool isShort) {
+  double bid = SymbolInfoDouble(symbol, SYMBOL_BID);
+  double ask = SymbolInfoDouble(symbol, SYMBOL_ASK);
+
+  if (isShort) {
+      return SymbolInfoDouble(symbol, SYMBOL_BID);
+  }
+  return SymbolInfoDouble(symbol, SYMBOL_ASK); 
 }

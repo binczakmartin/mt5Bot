@@ -26,12 +26,16 @@ void OpenPositions(string data) {
 }
 
 void openPosition(Prediction &prediction) {
+  if (!prediction.currentPrice) {
+    return;
+  }
+  
   double priceDifference = (prediction.predictedPrice - prediction.currentPrice) / prediction.currentPrice;
 
   if (priceDifference >= 0.01) {
-    openOrder(prediction, true);
-  } else if (priceDifference < -0.01) {
     openOrder(prediction, false);
+  } else if (priceDifference < -0.01) {
+    openOrder(prediction, true);
   }
 }
 
@@ -44,14 +48,4 @@ double GetNormalizedVolume(string symbol, double desiredVolume) {
     if (desiredVolume > maxVolume) return maxVolume;
 
     return MathRound((desiredVolume - minVolume) / stepVolume) * stepVolume + minVolume;
-}
-
-double getPrice(string symbol, bool isShort) {
-  double bid = SymbolInfoDouble(symbol, SYMBOL_BID);
-  double ask = SymbolInfoDouble(symbol, SYMBOL_ASK);
-
-  if (isShort) {
-      return round((bid*5 + ask) / 6, symbol);
-  }
-  return round((bid + ask*5) / 6, symbol); 
 }
