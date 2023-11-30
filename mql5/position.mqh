@@ -8,10 +8,10 @@
 void OpenPositions(string data) {
   int predictionsCount;
   
-  Prediction predictions[ArraySize(MARKETS)];
+  Prediction predictions[ArraySize(MARKETS) - 1];
   parsePredictions(data, predictions, predictionsCount);
 
-  for (int i = 0; i < ArraySize(predictions); i++) {
+  for (int i = 0; i < ArraySize(predictions) - 1; i++) {
     if (!checkOpenPosition(predictions[i].pair)
       || !checkOpenOrder(predictions[i].pair)
       || !CheckTotalOrdersAndPositions(NB_POSITION)) {

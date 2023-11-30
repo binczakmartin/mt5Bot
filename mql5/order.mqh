@@ -32,8 +32,15 @@ double GetLotsFromUSD(string symbol, double desiredUSD) {
   // Calculate the preliminary lots without considering min, max, and step
   double lots = desiredUSD / (lotSize * bid);
 
+  // Determine the number of decimal places for stepVolume
+  int decimals = 0;
+  while (stepVolume < 1) {
+    stepVolume *= 10;
+    decimals++;
+  }
+
   // Round to the nearest step size
-  lots = MathRound(lots / stepVolume) * stepVolume;
+  lots = NormalizeDouble(MathRound(lots / stepVolume) * stepVolume, decimals);
 
   // Ensure the lots are within min and max volume
   if (lots < minVolume) lots = minVolume;
@@ -102,10 +109,10 @@ void openOrder(Prediction &prediction, bool isShort) {
   double price = getPrice(prediction.pair, isShort);
   double volumeUnrounded = capital / price;
   double volume = GetNormalizedVolume(prediction.pair, volumeUnrounded);
-  double tpLong = round(price * 1.02, prediction.pair);
-  double slLong = round(price * 0.98, prediction.pair);
-  double tpShort = round(price * 0.98, prediction.pair);
-  double slShort = round(price * 1.02, prediction.pair);
+  double tpLong = round(price * 1.04, prediction.pair);
+  double slLong = round(price * 0.96, prediction.pair);
+  double tpShort = round(price * 0.96, prediction.pair);
+  double slShort = round(price * 1.04, prediction.pair);
   double lots = GetLotsFromUSD(prediction.pair, capital);
   
   Print("volume ", lots);

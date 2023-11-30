@@ -24,6 +24,7 @@ string GetJSONValueByIndex(string json, string key, int index, int startPos = 0)
 void parsePredictions(string response, Prediction &predictions[], int &predictionsCount) {
   LogToFile("Réponse de l'API : " + response);
   predictionsCount = 0; // Initialize predictions count
+  ShuffleArray(MARKETS);
   for (int i = 0; i < ArraySize(MARKETS); i++) {
     int pairPosition = StringFind(response, MARKETS[i]);
     if (pairPosition != -1) {
@@ -102,4 +103,15 @@ double getPrice(string symbol, bool isShort) {
       return SymbolInfoDouble(symbol, SYMBOL_BID);
   }
   return SymbolInfoDouble(symbol, SYMBOL_ASK); 
+}
+
+void ShuffleArray(string &arr[]) {
+  int n = ArraySize(arr);
+  MathSrand(TimeCurrent()); // Seed the random number generator with the current time
+  for (int i = n - 1; i > 0; i--) {
+    int j = MathRand() % (i + 1);
+    string temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
 }
