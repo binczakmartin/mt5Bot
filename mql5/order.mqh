@@ -109,10 +109,10 @@ void openOrder(Prediction &prediction, bool isShort) {
   double price = getPrice(prediction.pair, isShort);
   double volumeUnrounded = capital / price;
   double volume = GetNormalizedVolume(prediction.pair, volumeUnrounded);
-  double tpLong = round(price * 1.04, prediction.pair);
-  double slLong = round(price * 0.96, prediction.pair);
-  double tpShort = round(price * 0.96, prediction.pair);
-  double slShort = round(price * 1.04, prediction.pair);
+  double tpLong = round(price * 1.01, prediction.pair);
+  double slLong = round(price * 0.99, prediction.pair);
+  double tpShort = round(price * 0.99, prediction.pair);
+  double slShort = round(price * 1.01, prediction.pair);
   double lots = GetLotsFromUSD(prediction.pair, capital);
   
   Print("volume ", lots);
